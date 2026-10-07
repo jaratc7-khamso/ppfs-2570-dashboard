@@ -1,0 +1,1718 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PPFS 2570 Master Plan Dashboard</title>
+  <style>
+    :root {
+      --navy: #06224a;
+      --blue: #0b63ce;
+      --blue-2: #1687ff;
+      --sky: #2bb8ff;
+      --cyan: #10c7e8;
+      --mint: #d9f7ff;
+      --bg: #eef7ff;
+      --panel: #ffffff;
+      --ink: #122033;
+      --muted: #66768f;
+      --line: #d8e7f5;
+      --green: #10b981;
+      --yellow: #f5b942;
+      --red: #f05d5e;
+      --purple: #7c66e3;
+      --shadow: 0 18px 50px rgba(15, 82, 151, .16);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans Thai", Tahoma, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(43, 184, 255, .28), transparent 28rem),
+        radial-gradient(circle at 90% 8%, rgba(16, 199, 232, .20), transparent 24rem),
+        linear-gradient(180deg, #f4fbff 0%, var(--bg) 38%, #f7fbff 100%);
+      min-height: 100vh;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(6, 34, 74, .96), rgba(11, 99, 206, .92)),
+        radial-gradient(circle at top left, rgba(43, 184, 255, .42), transparent 22rem);
+    }
+
+    .login-card {
+      width: min(440px, 100%);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 26px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .28);
+      padding: 32px;
+    }
+
+    .login-card h1 {
+      margin: 0;
+      font-size: 30px;
+      color: var(--navy);
+      letter-spacing: 0;
+    }
+
+    .login-card p {
+      margin: 10px 0 24px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .app-shell {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 46px;
+      display: none;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      padding: 28px;
+      background:
+        linear-gradient(125deg, var(--navy), #084f9f 62%, #0fb7e7);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -150px;
+      width: 360px;
+      height: 360px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+    }
+
+    .hero-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .brand-kicker {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.2);
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .hero h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 860px;
+      color: #d7f4ff;
+      line-height: 1.65;
+      font-size: 16px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--sky));
+      box-shadow: 0 14px 28px rgba(11, 99, 206, .22);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 18px 34px rgba(11, 99, 206, .28); }
+    .btn.secondary { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.24); box-shadow: none; }
+    .btn.ghost { background: #e9f5ff; color: var(--blue); box-shadow: none; }
+    .btn.danger { background: linear-gradient(135deg, #ef4444, #fb7185); }
+    .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+
+    .section {
+      margin-top: 18px;
+      border: 1px solid rgba(216, 231, 245, .86);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.86);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-header {
+      padding: 18px 20px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .section-title {
+      margin: 0;
+      color: var(--navy);
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .section-subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .filters {
+      margin-top: -24px;
+      position: relative;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+      color: var(--ink);
+      padding: 10px 12px;
+      outline: none;
+      min-height: 42px;
+      transition: border .18s ease, box-shadow .18s ease;
+    }
+
+    .field textarea { min-height: 82px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--sky);
+      box-shadow: 0 0 0 4px rgba(43, 184, 255, .15);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .kpi-card {
+      overflow: hidden;
+      position: relative;
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, white, #f8fcff);
+      border: 1px solid var(--line);
+    }
+
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: var(--accent, var(--blue));
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .kpi-value {
+      margin-top: 10px;
+      font-size: clamp(25px, 3vw, 36px);
+      font-weight: 900;
+      color: var(--navy);
+      line-height: 1;
+      word-break: break-word;
+    }
+
+    .kpi-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.45fr .85fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .chart-wrap {
+      padding: 18px;
+    }
+
+    .chart {
+      width: 100%;
+      min-height: 278px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff, #f7fbff);
+      border: 1px solid var(--line);
+      padding: 16px;
+    }
+
+    .svg-chart {
+      display: block;
+      width: 100%;
+      height: 250px;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .donut-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 18px;
+    }
+
+    .donut {
+      width: 124px;
+      height: 124px;
+      border-radius: 999px;
+      background: conic-gradient(var(--blue) 0deg, var(--sky) 0deg);
+      display: grid;
+      place-items: center;
+    }
+
+    .donut::after {
+      content: "";
+      width: 74px;
+      height: 74px;
+      border-radius: 999px;
+      background: white;
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 7px;
+    }
+
+    .bar-list {
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(110px, 1fr) 2fr 80px;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 99px;
+      background: #e4f2ff;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--sky));
+    }
+
+    .table-wrap {
+      overflow: auto;
+      padding: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 980px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 12px 11px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #eef7ff;
+      color: #234264;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    td {
+      color: #26384f;
+      background: rgba(255,255,255,.72);
+    }
+
+    .service-name {
+      font-weight: 800;
+      color: var(--navy);
+      max-width: 320px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 54px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      background: #eaf5ff;
+      color: var(--blue);
+    }
+
+    .pill.high { background: #e7f8ff; color: #0573b8; }
+    .pill.mid { background: #fff7de; color: #a26900; }
+    .pill.low { background: #ecfdf5; color: #047857; }
+
+    .progress {
+      width: 120px;
+      height: 8px;
+      border-radius: 99px;
+      background: #e4edf7;
+      overflow: hidden;
+      margin-top: 7px;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+    }
+
+    .forms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .form-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff, #f8fcff);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .form-card h3 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 17px;
+    }
+
+    .form-card p {
+      margin: -5px 0 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+      max-width: min(420px, calc(100vw - 36px));
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: white;
+      background: rgba(6, 34, 74, .95);
+      box-shadow: 0 18px 50px rgba(0,0,0,.25);
+      transform: translateY(140%);
+      transition: transform .25s ease;
+    }
+
+    .toast.show { transform: translateY(0); }
+    .toast.error { background: rgba(220, 38, 38, .96); }
+    .toast.success { background: rgba(5, 150, 105, .96); }
+
+    .empty {
+      padding: 26px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      background: #f8fcff;
+    }
+
+    .hide { display: none !important; }
+
+    @media (max-width: 1120px) {
+      .filters { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 18px; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .content-grid { grid-template-columns: 1fr; }
+      .forms-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .app-shell { width: min(100% - 20px, 1440px); padding-top: 10px; }
+      .hero { border-radius: 20px; padding: 20px; }
+      .hero-top { flex-direction: column; }
+      .hero-actions { justify-content: flex-start; width: 100%; }
+      .hero-actions .btn { flex: 1; }
+      .filters { grid-template-columns: 1fr; padding: 14px; }
+      .kpi-grid { grid-template-columns: 1fr; padding: 14px; }
+      .section-header { flex-direction: column; }
+      .donut-row { grid-template-columns: 1fr; justify-items: center; }
+      .bar-row { grid-template-columns: 1fr; }
+      .two-cols { grid-template-columns: 1fr; }
+      .login-card { padding: 24px; }
+    }
+
+    /* V8 Executive Early Warning */
+    .exec-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:0 18px 18px}
+    .exec-card{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}
+    .exec-card h3{margin:0 0 7px;font-size:14px;color:var(--muted)}
+    .exec-card .big{font-size:27px;font-weight:900;color:var(--navy);line-height:1.15}
+    .exec-card small{display:block;margin-top:7px;color:var(--muted);font-weight:600}
+    .alert-list{display:grid;gap:10px;padding:0 18px 18px}
+    .alert-item{display:grid;grid-template-columns:92px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff}
+    .signal{display:inline-flex;justify-content:center;align-items:center;border-radius:999px;padding:6px 10px;font-weight:900;font-size:12px}
+    .signal.red{background:#fee2e2;color:#b91c1c}.signal.yellow{background:#fef3c7;color:#92400e}.signal.green{background:#dcfce7;color:#166534}
+    .alert-name{font-weight:800;color:var(--navy)} .alert-detail{font-size:12px;color:var(--muted);margin-top:3px}
+    .action-list{display:grid;gap:9px;padding:0 18px 18px}.action-item{border-left:5px solid #1687ff;background:#f7fbff;border-radius:12px;padding:12px 14px;font-weight:700;color:var(--navy)}
+    @media(max-width:900px){.exec-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.alert-item{grid-template-columns:80px 1fr}}
+    @media(max-width:600px){.exec-grid{grid-template-columns:1fr}.alert-item{grid-template-columns:1fr}.alert-item>div:last-child{text-align:left!important}}
+  </style>
+</head>
+<body>
+  <div class="login-screen" id="loginScreen">
+    <form class="login-card" id="loginForm">
+      <span class="brand-kicker" style="background:#e8f6ff;color:#0b63ce;border-color:#cae9ff;">PPFS 2570</span>
+      <h1>เข้าสู่ระบบ Dashboard</h1>
+      <p>
+  ระบบอ่านและบันทึกข้อมูลผ่าน Google Apps Script
+  กรุณาเข้าสู่ระบบเพื่อใช้งาน Dashboard
+      </p>
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" autocomplete="username" required>
+      </div>
+      <div class="field" style="margin-top:12px;">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn" style="width:100%;margin-top:18px;" type="submit">เข้าสู่ระบบ</button>
+      <button class="btn ghost" style="width:100%;margin-top:10px;" type="button" id="registerBtn">สมัครผู้ใช้งานใหม่</button>
+      <button class="btn ghost" style="width:100%;margin-top:10px;" type="button" id="demoHintBtn">ตรวจ URL การเชื่อมต่อ</button>
+      <p id="loginMessage" style="margin-bottom:0;color:#dc2626;"></p>
+    </form>
+  </div>
+
+  <main class="app-shell" id="app">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <span class="brand-kicker">PPFS 2570 • V.7.1 Performance Dashboard</span>
+          <h1>Dashboard แผนปฏิบัติการ PPFS สำหรับ รพช./รพ.สต.</h1>
+          <p id="dashboardScope">ติดตาม Target, ผลงาน, Claim, Paid, Gap และ Opportunity Loss พร้อมเปรียบเทียบผลการดำเนินงานระดับ CUP</p>
+        </div>
+        <div class="hero-actions">
+          <span id="userBadge" style="background:rgba(255,255,255,.18);padding:10px 14px;border-radius:999px;font-weight:700;"></span>
+          <button class="btn secondary" id="adminBtn" type="button" style="display:none;">จัดการผู้ใช้</button>
+          <button class="btn secondary" id="refreshBtn" type="button">รีเฟรชข้อมูล</button>
+          <button class="btn danger" id="logoutBtn" type="button">ออกจากระบบ</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section filters" aria-label="ตัวกรองข้อมูล">
+      <div class="field">
+        <label for="filterMonth">เดือน</label>
+        <select id="filterMonth"></select>
+      </div>
+      <div class="field">
+        <label for="filterUnit">หน่วยบริการ</label>
+        <select id="filterUnit"></select>
+      </div>
+      <div class="field">
+        <label for="filterPriority">Priority</label>
+        <select id="filterPriority"></select>
+      </div>
+      <div class="field">
+        <label for="filterService">รายการบริการ</label>
+        <select id="filterService"></select>
+      </div>
+      <div class="field">
+        <label for="filterSearch">ค้นหา</label>
+        <input id="filterSearch" placeholder="ชื่อบริการ / ผู้รับผิดชอบ / ระบบ Claim">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn" id="clearFiltersBtn" type="button">ล้างตัวกรอง</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">ภาพรวมสำคัญ</h2>
+          <p class="section-subtitle" id="lastUpdated">กำลังโหลดข้อมูล...</p>
+        </div>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </section>
+
+
+
+    <section class="section" id="executiveSection">
+      <div class="section-header"><div>
+        <h2 class="section-title">Executive Early Warning</h2>
+        <p class="section-subtitle">สรุปสัญญาณเตือนจาก Monthly Tracker ตามตัวกรองปัจจุบัน • แดง &lt;60% • เหลือง 60–79.9% • เขียว ≥80%</p>
+      </div></div>
+      <div class="exec-grid" id="executiveCards"></div>
+      <div class="section-header"><div><h2 class="section-title" style="font-size:17px">บริการที่ควรเร่งดำเนินการ</h2><p class="section-subtitle">จัดลำดับจากสถานะ Coverage, Opportunity Loss, Gap และความต่างระหว่างผลงานกับการเบิกจ่าย</p></div></div>
+      <div class="alert-list" id="earlyWarningList"></div>
+      <div class="section-header"><div><h2 class="section-title" style="font-size:17px">Top 5 ข้อเสนอเพื่อการบริหาร</h2><p class="section-subtitle">สร้างอัตโนมัติจากข้อมูลที่บันทึกในระบบ ไม่ใช่การวินิจฉัยทางคลินิก</p></div></div>
+      <div class="action-list" id="executiveActions"></div>
+    </section>
+
+    <section class="section" id="unitRankingSection">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">เปรียบเทียบผลงานหน่วยบริการ</h2>
+          <p class="section-subtitle">ADMIN / MANAGER เห็นภาพรวม CUP • คลิกแถวเพื่อกรอง Dashboard ตามหน่วยบริการ</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>อันดับ</th><th>หน่วยบริการ</th><th>Target</th><th>ผลงาน</th><th>Coverage</th><th>Claim ผ่าน</th><th>Paid</th><th>Reject</th><th>Gap</th><th>Opportunity Loss</th></tr></thead>
+          <tbody id="unitRankingBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">แนวโน้มรายเดือน</h2>
+            <p class="section-subtitle">เปรียบเทียบ Target, ผลงาน และ Paid จาก Monthly Tracker</p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart">
+            <svg class="svg-chart" id="monthlyChart" viewBox="0 0 760 250" role="img"></svg>
+          </div>
+        </div>
+      </section>
+
+      <div class="side-stack">
+        <section class="section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">สัดส่วน Priority</h2>
+              <p class="section-subtitle">อิงจากรายการบริการใน Master Plan</p>
+            </div>
+          </div>
+          <div class="donut-row">
+            <div class="donut" id="priorityDonut"></div>
+            <div class="legend" id="priorityLegend"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Top Gap</h2>
+              <p class="section-subtitle">บริการที่ยังเหลือช่องว่างสูงสุด</p>
+            </div>
+          </div>
+          <div class="bar-list" id="topGapList"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Master Plan รายบริการ</h2>
+          <p class="section-subtitle">คอลัมน์คำนวณจะคำนวณซ้ำบน Dashboard เพื่อให้แสดงผลถูกต้องแม้สูตรในชีตยังไม่ครบ</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>รายการบริการ</th>
+              <th>Priority</th>
+              <th>Target ปี</th>
+              <th>ผลงาน</th>
+              <th>Coverage</th>
+              <th>Claim Rate</th>
+              <th>Paid Rate</th>
+              <th>Gap</th>
+              <th>Opportunity Loss</th>
+            </tr>
+          </thead>
+          <tbody id="masterTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Monthly Tracker</h2>
+          <p class="section-subtitle">แสดงสูงสุด 120 แถวตามตัวกรองปัจจุบัน</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>เดือน</th>
+              <th>หน่วยบริการ</th>
+              <th>บริการ</th>
+              <th>Target</th>
+              <th>ผลงาน</th>
+              <th>Claim ผ่าน</th>
+              <th>Paid</th>
+              <th>Reject</th>
+              <th>มูลค่า Paid</th>
+            </tr>
+          </thead>
+          <tbody id="trackerTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">กรอก / บันทึกข้อมูล</h2>
+          <p class="section-subtitle">ฟอร์มจะบันทึกกลับ Google Sheet ผ่าน GAS โดยใช้ token หลัง Login</p>
+        </div>
+      </div>
+      <div class="forms-grid">
+        <form class="form-card" id="masterForm">
+          <h3>อัปเดต Master Plan</h3>
+          <p>ใช้สำหรับตั้ง Target ปี และสรุปผลงานรายบริการ</p>
+          <div class="field">
+            <label>รายการบริการ</label>
+            <select id="masterService" required></select>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>Priority</label><select id="masterPriority"><option>สูง</option><option>กลาง</option><option>ต่ำ</option></select></div>
+            <div class="field"><label>อัตราวางแผน</label><input id="masterRate" type="number" min="0" step="0.01"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>Target ปี</label><input id="masterTarget" type="number" min="0" step="1"></div>
+            <div class="field"><label>ผลงาน</label><input id="masterOutput" type="number" min="0" step="1"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>Claim ผ่าน</label><input id="masterClaim" type="number" min="0" step="1"></div>
+            <div class="field"><label>Paid</label><input id="masterPaid" type="number" min="0" step="1"></div>
+          </div>
+          <div class="field"><label>ผู้รับผิดชอบหลัก</label><input id="masterOwner"></div>
+          <button class="btn" type="submit">บันทึก Master Plan</button>
+        </form>
+
+        <form class="form-card" id="monthlyForm">
+          <h3>บันทึก Monthly Tracker</h3>
+          <p>บันทึกหรืออัปเดตแถวตาม เดือน + หน่วยบริการ + รายการบริการ</p>
+          <div class="two-cols">
+            <div class="field"><label>เดือน</label><select id="monthlyMonth" required></select></div>
+            <div class="field"><label>หน่วยบริการ</label><select id="monthlyUnit" required></select></div>
+          </div>
+          <div class="field"><label>รายการบริการ</label><select id="monthlyService" required></select></div>
+          <div class="two-cols">
+            <div class="field"><label>Target</label><input id="monthlyTarget" type="number" min="0" step="1"></div>
+            <div class="field"><label>ผลงาน</label><input id="monthlyOutput" type="number" min="0" step="1"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>Claim ผ่าน</label><input id="monthlyClaim" type="number" min="0" step="1"></div>
+            <div class="field"><label>Paid</label><input id="monthlyPaid" type="number" min="0" step="1"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>Reject</label><input id="monthlyReject" type="number" min="0" step="1"></div>
+            <div class="field"><label>มูลค่า Paid</label><input id="monthlyPaidValue" type="number" min="0" step="0.01"></div>
+          </div>
+          <div class="field"><label>หมายเหตุ</label><textarea id="monthlyNote"></textarea></div>
+          <button class="btn" type="submit">บันทึก Monthly</button>
+        </form>
+
+        <form class="form-card" id="targetForm">
+          <h3>บันทึก RPH Target</h3>
+          <p>ใช้สำหรับแจกเป้าหมายราย รพ.สต./หน่วยบริการ</p>
+          <div class="field"><label>รพ.สต./หน่วยบริการ</label><select id="targetUnit" required></select></div>
+          <div class="two-cols">
+            <div class="field"><label>ประชากรทั้งหมด</label><input id="targetPopulation" type="number" min="0"></div>
+            <div class="field"><label>DM 35-59 เสี่ยง</label><input id="targetDm" type="number" min="0"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>Lipid 45-70</label><input id="targetLipid" type="number" min="0"></div>
+            <div class="field"><label>Cervical Due</label><input id="targetCervical" type="number" min="0"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>FIT Due</label><input id="targetFit" type="number" min="0"></div>
+            <div class="field"><label>TB Risk</label><input id="targetTb" type="number" min="0"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>HBV Due</label><input id="targetHbv" type="number" min="0"></div>
+            <div class="field"><label>HCV Due</label><input id="targetHcv" type="number" min="0"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>หญิง 13-24 CBC</label><input id="targetCbc" type="number" min="0"></div>
+            <div class="field"><label>หญิง 13-45 Fe/Folic</label><input id="targetFe" type="number" min="0"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>เด็ก 6-12ด.</label><input id="targetChild612" type="number" min="0"></div>
+            <div class="field"><label>เด็ก 3-5ปี</label><input id="targetChild35" type="number" min="0"></div>
+          </div>
+          <div class="two-cols">
+            <div class="field"><label>หญิง ≥60 FRAX</label><input id="targetFrax" type="number" min="0"></div>
+            <div class="field"><label>หมายเหตุ</label><input id="targetNote"></div>
+          </div>
+          <button class="btn" type="submit">บันทึก RPH Target</button>
+        </form>
+      </div>
+    </section>
+
+    <datalist id="unitList"></datalist>
+  </main>
+
+  <div id="registerModal" style="display:none;position:fixed;inset:0;background:rgba(5,25,55,.65);z-index:9998;align-items:center;justify-content:center;padding:20px;">
+    <form id="registerForm" class="login-card" style="width:min(560px,100%);max-height:92vh;overflow:auto;">
+      <h2 style="margin-top:0;">สมัครผู้ใช้งาน PPFS</h2>
+      <p>สมัครแล้วสถานะจะเป็น <b>รออนุมัติ</b> จนกว่า Admin จะอนุมัติ</p>
+      <div class="field"><label>ชื่อ-สกุล</label><input id="regFullName" required></div>
+      <div class="field" style="margin-top:10px;"><label>Username</label><input id="regUsername" required placeholder="เช่น pandung01"></div>
+      <div class="field" style="margin-top:10px;"><label>Password (อย่างน้อย 8 ตัว)</label><input id="regPassword" type="password" minlength="8" required></div>
+      <div class="field" style="margin-top:10px;"><label>หน่วยบริการ</label><select id="regUnit" required><option value="">กำลังโหลด...</option></select></div>
+      <div class="field" style="margin-top:10px;"><label>หมายเหตุ/ตำแหน่ง</label><input id="regNote"></div>
+      <button class="btn" style="width:100%;margin-top:16px;" type="submit">ส่งคำขอสมัคร</button>
+      <button class="btn ghost" style="width:100%;margin-top:8px;" type="button" id="closeRegisterBtn">ยกเลิก</button>
+      <p id="registerMessage" style="color:#dc2626;"></p>
+    </form>
+  </div>
+
+  <div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(5,25,55,.65);z-index:9998;align-items:center;justify-content:center;padding:20px;">
+    <div class="section" style="width:min(1100px,100%);max-height:92vh;overflow:auto;">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;"><h2>จัดการผู้ใช้งาน</h2><button class="btn ghost" id="closeAdminBtn" type="button">ปิด</button></div>
+      <p>Admin สามารถอนุมัติ/ระงับ กำหนด Role และหน่วยบริการได้</p>
+      <div style="overflow:auto;"><table class="data-table"><thead><tr><th>Username</th><th>ชื่อ-สกุล</th><th>หน่วยบริการ</th><th>Role</th><th>Status</th><th>จัดการ</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwwoHqkYtWcwWAOgHlHpLWA-2I1XXWsB6vgU0V6OZk5YJHkaHyqHqCXBruAQTxcolJ2/exec';
+    const TOKEN_KEY = 'ppfs2570_token_v71';
+    const USER_KEY = 'ppfs2570_user_v71';
+
+    const state = {
+      token: localStorage.getItem(TOKEN_KEY) || '',
+      user: localStorage.getItem(USER_KEY) || '',
+      profile: {},
+      master: [],
+      tracker: [],
+      targets: [],
+      options: { months: [], units: [], priorities: [], services: [] },
+      serviceById: new Map(),
+      serviceByName: new Map()
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const fmt = new Intl.NumberFormat('th-TH');
+    const moneyFmt = new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 });
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    function num(value) {
+      if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+      const n = Number(String(value ?? '').replace(/,/g, '').replace(/%/g, '').trim());
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function pct(a, b) {
+      return b ? (num(a) / num(b)) * 100 : 0;
+    }
+
+    function clampPct(value) {
+      return Math.max(0, Math.min(100, num(value)));
+    }
+
+    function shortText(text, max = 42) {
+      text = String(text ?? '');
+      return text.length > max ? text.slice(0, max - 1) + '…' : text;
+    }
+
+    function toast(message, type = '') {
+      const box = $('toast');
+      box.textContent = message;
+      box.className = 'toast show ' + type;
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => box.className = 'toast', 3600);
+    }
+
+    function setBusy(button, busy) {
+      if (!button) return;
+      button.disabled = busy;
+      if (busy) button.dataset.label = button.textContent;
+      button.textContent = busy ? 'กำลังบันทึก...' : (button.dataset.label || button.textContent);
+    }
+
+    function isGasReady() {
+      return /^https:\/\/script\.google\.com\/macros\/s\//.test(GAS_URL);
+    }
+
+    function api(action, params = {}) {
+      if (!isGasReady()) {
+        return Promise.reject(new Error('กรุณาใส่ GAS Web App URL ในตัวแปร GAS_URL ก่อนใช้งาน'));
+      }
+
+      return new Promise((resolve, reject) => {
+        const callback = 'ppfsCb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const url = new URL(GAS_URL);
+        url.searchParams.set('action', action);
+        url.searchParams.set('callback', callback);
+        if (state.token && action !== 'login') url.searchParams.set('token', state.token);
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) url.searchParams.set(key, value);
+        });
+
+        const script = document.createElement('script');
+        const timeout = setTimeout(() => cleanup(new Error('เชื่อมต่อ GAS ไม่สำเร็จหรือใช้เวลานานเกินไป')), 30000);
+
+        function cleanup(error, payload) {
+          clearTimeout(timeout);
+          delete window[callback];
+          script.remove();
+          if (error) reject(error);
+          else if (!payload || payload.ok === false) reject(new Error(payload?.error || 'GAS ส่งคำตอบไม่ถูกต้อง'));
+          else resolve(payload.result);
+        }
+
+        window[callback] = (payload) => cleanup(null, payload);
+        script.onerror = () => cleanup(new Error('โหลด GAS Web App ไม่สำเร็จ'));
+        script.src = url.toString();
+        document.head.appendChild(script);
+      });
+    }
+
+    async function login(username, password) {
+      const result = await api('login', { username, password });
+      state.token = result.token;
+      state.user = result.username;
+      state.profile = result;
+      localStorage.setItem(TOKEN_KEY, result.token);
+      localStorage.setItem(USER_KEY, result.username);
+    }
+
+    function logout() {
+      state.token = '';
+      state.user = '';
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      $('app').style.display = 'none';
+      $('loginScreen').style.display = 'grid';
+      $('password').value = '';
+    }
+
+    async function loadDashboard() {
+      $('lastUpdated').textContent = 'กำลังโหลดข้อมูลจาก Google Sheet...';
+      const result = await api('dashboard');
+      state.master = result.master || [];
+      state.tracker = result.tracker || [];
+      state.targets = result.targets || [];
+      state.profile = result.user || state.profile || {};
+      state.options = result.options || state.options;
+      state.serviceById = new Map(state.master.map((row) => [String(row['ลำดับ']), row]));
+      state.serviceByName = new Map(state.master.map((row) => [String(row['รายการบริการ']), row]));
+      $('lastUpdated').textContent = 'อัปเดตล่าสุด: ' + (result.generatedAt || '-');
+      fillAllControls();
+      applyPermissions();
+      renderAll();
+    }
+
+    function fillSelect(select, items, current = '', allLabel = 'ทั้งหมด') {
+      const selected = current || select.value;
+      const opts = [`<option value="">${allLabel}</option>`].concat(
+        items.map((item) => `<option value="${esc(item.value ?? item)}">${esc(item.label ?? item)}</option>`)
+      );
+      select.innerHTML = opts.join('');
+      select.value = selected;
+    }
+
+    function fillAllControls() {
+      const serviceOptions = state.options.services.map((s) => ({
+        value: s.id,
+        label: `${s.id}. ${s.name}`
+      }));
+      fillSelect($('filterMonth'), state.options.months);
+      fillSelect($('filterPriority'), state.options.priorities);
+      fillSelect($('filterService'), serviceOptions);
+
+      fillSelect($('masterService'), serviceOptions, $('masterService').value, 'เลือกรายการบริการ');
+      fillSelect($('monthlyMonth'), state.options.months, $('monthlyMonth').value, 'เลือกเดือน');
+      fillSelect($('monthlyService'), serviceOptions, $('monthlyService').value, 'เลือกรายการบริการ');
+
+      // ===== Dropdown หน่วยบริการ (V.7.1: ตัด placeholder และยึดสิทธิ์ UNIT เป็นหลัก) =====
+      const isPlaceholderUnit = (v) => {
+        const x = String(v ?? '').trim();
+        return !x || /^รพช\.?\s*\/\s*รพ\.?สต\.?$/i.test(x) || x === 'กรอกชื่อหน่วยบริการ' || x === 'เลือกหน่วยบริการ';
+      };
+      const rawUnits = state.options.units || [];
+      const unitOptions = rawUnits.filter((item) => !isPlaceholderUnit(item?.value ?? item));
+      const role = String(state.profile?.role || '').toUpperCase();
+      const profileUnit = String(state.profile?.unit || '').trim();
+
+      // UNIT: ใส่หน่วยจากบัญชีโดยตรง แม้ options จากชีตจะยังไม่สมบูรณ์
+      if (role === 'UNIT' && profileUnit && !isPlaceholderUnit(profileUnit)) {
+        const exists = unitOptions.some((item) => String(item?.value ?? item).trim() === profileUnit);
+        if (!exists) unitOptions.unshift(profileUnit);
+      }
+
+      const wantedFilter = role === 'UNIT' ? profileUnit : $('filterUnit').value;
+      const wantedMonthly = role === 'UNIT' ? profileUnit : $('monthlyUnit').value;
+      const wantedTarget = role === 'UNIT' ? profileUnit : $('targetUnit').value;
+      fillSelect($('filterUnit'), unitOptions, wantedFilter, 'ทุกหน่วยบริการ');
+      fillSelect($('monthlyUnit'), unitOptions, wantedMonthly, 'เลือกหน่วยบริการ');
+      fillSelect($('targetUnit'), unitOptions, wantedTarget, 'เลือกหน่วยบริการ');
+
+      if (role !== 'UNIT') {
+        if (!$('monthlyUnit').value && unitOptions.length) $('monthlyUnit').value = String(unitOptions[0]?.value ?? unitOptions[0]);
+        if (!$('targetUnit').value && unitOptions.length) $('targetUnit').value = String(unitOptions[0]?.value ?? unitOptions[0]);
+      }
+
+      populateMasterForm();
+      // applyPermissions() หลัง fillAllControls() จะยืนยัน UNIT อีกครั้งก่อน populate ฟอร์ม
+      if (role !== 'UNIT') {
+        populateMonthlyForm();
+        populateTargetForm();
+      }
+    }
+
+    function filters() {
+      return {
+        month: $('filterMonth').value,
+        unit: $('filterUnit').value,
+        priority: $('filterPriority').value,
+        service: $('filterService').value,
+        search: $('filterSearch').value.trim().toLowerCase()
+      };
+    }
+
+    function masterFiltered() {
+      const f = filters();
+      return state.master.filter((row) => {
+        const text = [
+          row['รายการบริการ'], row['กลุ่มเป้าหมาย'], row['ผู้รับผิดชอบหลัก'],
+          row['ระบบบันทึก/Claim'], row['แนวทางปฏิบัติระดับ CUP']
+        ].join(' ').toLowerCase();
+        return (!f.priority || row['Priority'] === f.priority) &&
+          (!f.service || String(row['ลำดับ']) === f.service) &&
+          (!f.search || text.includes(f.search));
+      });
+    }
+
+    function trackerFiltered() {
+      const f = filters();
+      return state.tracker.filter((row) => {
+        const serviceId = String(row['ลำดับบริการ'] || '');
+        const meta = state.serviceById.get(serviceId) || state.serviceByName.get(String(row['รายการบริการ'])) || {};
+        const text = [row['รายการบริการ'], row['หน่วยบริการ'], row['หมายเหตุ'], meta['ผู้รับผิดชอบหลัก']].join(' ').toLowerCase();
+        return (!f.month || row['เดือน'] === f.month) &&
+          (!f.unit || row['หน่วยบริการ'] === f.unit) &&
+          (!f.service || serviceId === f.service) &&
+          (!f.priority || meta['Priority'] === f.priority) &&
+          (!f.search || text.includes(f.search));
+      });
+    }
+
+    function summarize(rows) {
+      return rows.reduce((acc, row) => {
+        const target = num(row['Target']);
+        const output = num(row['ผลงาน']);
+        const claim = num(row['Claim ผ่าน']);
+        const paid = num(row['Paid']);
+        const reject = num(row['Reject']);
+        const serviceId = String(row['ลำดับบริการ'] || '');
+        const meta = state.serviceById.get(serviceId) || state.serviceByName.get(String(row['รายการบริการ'])) || {};
+        const rate = num(meta['อัตราวางแผน (บาท)'] ?? row._rate);
+        const gap = Math.max(target - output, 0);
+        acc.target += target;
+        acc.output += output;
+        acc.claim += claim;
+        acc.paid += paid;
+        acc.reject += reject;
+        acc.gap += gap;
+        acc.paidValue += num(row['มูลค่า Paid']) || paid * rate;
+        acc.loss += gap * rate;
+        return acc;
+      }, { target: 0, output: 0, claim: 0, paid: 0, reject: 0, gap: 0, paidValue: 0, loss: 0 });
+    }
+
+    function renderKpis() {
+      const s = summarize(trackerFiltered());
+      const cards = [
+        ['Target รวม', fmt.format(s.target), 'ตาม Monthly Tracker', '--blue'],
+        ['ผลงานรวม', fmt.format(s.output), `Gap ${fmt.format(s.gap)}`, '--sky'],
+        ['Coverage', pct(s.output, s.target).toFixed(1) + '%', 'ผลงาน / Target', '--cyan'],
+        ['Claim ผ่าน', fmt.format(s.claim), `Claim Rate ${pct(s.claim, s.output).toFixed(1)}%`, '--purple'],
+        ['Paid', fmt.format(s.paid), `Paid Rate ${pct(s.paid, s.claim).toFixed(1)}%`, '--green'],
+        ['Reject', fmt.format(s.reject), 'รายการที่ต้องติดตามแก้ไข', '--red'],
+        ['มูลค่า Paid', moneyFmt.format(s.paidValue), 'บาท', '--blue'],
+        ['Opportunity Loss', moneyFmt.format(s.loss), 'บาท จาก Gap × อัตราวางแผน', '--yellow']
+      ];
+      $('kpiGrid').innerHTML = cards.map(([label, value, note, color]) => `
+        <article class="kpi-card" style="--accent:var(${color})">
+          <div class="kpi-label">${esc(label)}</div>
+          <div class="kpi-value">${esc(value)}</div>
+          <div class="kpi-note">${esc(note)}</div>
+        </article>
+      `).join('');
+    }
+
+    function renderMonthlyChart() {
+      const rows = trackerFiltered();
+      const months = state.options.months.filter((m) => !filters().month || m === filters().month);
+      const grouped = new Map(months.map((m) => [m, { target: 0, output: 0, paid: 0 }]));
+      rows.forEach((row) => {
+        const item = grouped.get(row['เดือน']) || { target: 0, output: 0, paid: 0 };
+        item.target += num(row['Target']);
+        item.output += num(row['ผลงาน']);
+        item.paid += num(row['Paid']);
+        grouped.set(row['เดือน'], item);
+      });
+
+      const data = Array.from(grouped, ([month, value]) => ({ month, ...value }));
+      const max = Math.max(1, ...data.flatMap((d) => [d.target, d.output, d.paid]));
+      const width = 760, height = 250, base = 205, top = 22;
+      const slot = data.length ? (width - 70) / data.length : 0;
+      let svg = `<line x1="46" y1="${base}" x2="742" y2="${base}" stroke="#d8e7f5" stroke-width="1"/>`;
+
+      data.forEach((d, i) => {
+        const x = 54 + i * slot;
+        const bw = Math.max(8, Math.min(18, slot / 5));
+        const h1 = (d.target / max) * (base - top);
+        const h2 = (d.output / max) * (base - top);
+        const h3 = (d.paid / max) * (base - top);
+        svg += `<rect x="${x}" y="${base - h1}" width="${bw}" height="${h1}" rx="4" fill="#b7dcff"/>`;
+        svg += `<rect x="${x + bw + 3}" y="${base - h2}" width="${bw}" height="${h2}" rx="4" fill="#1687ff"/>`;
+        svg += `<rect x="${x + (bw + 3) * 2}" y="${base - h3}" width="${bw}" height="${h3}" rx="4" fill="#10c7e8"/>`;
+        svg += `<text x="${x + bw}" y="230" text-anchor="middle" font-size="10" fill="#66768f">${esc(d.month.replace('.70', '').replace('.69', ''))}</text>`;
+      });
+
+      svg += `<text x="54" y="16" font-size="12" fill="#66768f">Target</text><rect x="96" y="7" width="12" height="12" rx="3" fill="#b7dcff"/>`;
+      svg += `<text x="128" y="16" font-size="12" fill="#66768f">ผลงาน</text><rect x="178" y="7" width="12" height="12" rx="3" fill="#1687ff"/>`;
+      svg += `<text x="210" y="16" font-size="12" fill="#66768f">Paid</text><rect x="244" y="7" width="12" height="12" rx="3" fill="#10c7e8"/>`;
+      $('monthlyChart').innerHTML = svg;
+    }
+
+    function renderPriorityDonut() {
+      const rows = masterFiltered();
+      const counts = { 'สูง': 0, 'กลาง': 0, 'ต่ำ': 0, 'อื่น ๆ': 0 };
+      rows.forEach((row) => {
+        const key = counts.hasOwnProperty(row['Priority']) ? row['Priority'] : 'อื่น ๆ';
+        counts[key] += 1;
+      });
+      const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+      const colors = { 'สูง': '#1687ff', 'กลาง': '#10c7e8', 'ต่ำ': '#10b981', 'อื่น ๆ': '#f5b942' };
+      let start = 0;
+      const segments = Object.entries(counts).map(([key, value]) => {
+        const deg = (value / total) * 360;
+        const seg = `${colors[key]} ${start}deg ${start + deg}deg`;
+        start += deg;
+        return seg;
+      });
+      $('priorityDonut').style.background = `conic-gradient(${segments.join(',')})`;
+      $('priorityLegend').innerHTML = Object.entries(counts).map(([key, value]) => `
+        <div class="legend-item"><span><i class="dot" style="background:${colors[key]}"></i>${esc(key)}</span><b>${fmt.format(value)}</b></div>
+      `).join('');
+    }
+
+    function renderTopGap() {
+      const byService = new Map();
+      trackerFiltered().forEach((row) => {
+        const id = String(row['ลำดับบริการ'] || '');
+        const name = row['รายการบริการ'];
+        const target = num(row['Target']);
+        const output = num(row['ผลงาน']);
+        const gap = Math.max(target - output, 0);
+        const item = byService.get(id || name) || { name, gap: 0 };
+        item.gap += gap;
+        byService.set(id || name, item);
+      });
+      const top = Array.from(byService.values()).sort((a, b) => b.gap - a.gap).slice(0, 6);
+      const max = Math.max(1, ...top.map((d) => d.gap));
+      if (!top.length || top.every((d) => d.gap === 0)) {
+        $('topGapList').innerHTML = '<div class="empty">ยังไม่มี Gap ตามตัวกรองนี้</div>';
+        return;
+      }
+      $('topGapList').innerHTML = top.map((d) => `
+        <div class="bar-row">
+          <div title="${esc(d.name)}">${esc(shortText(d.name, 28))}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(d.gap / max) * 100}%"></div></div>
+          <b>${fmt.format(d.gap)}</b>
+        </div>
+      `).join('');
+    }
+
+
+
+    function executiveRows() {
+      const byService = new Map();
+      trackerFiltered().forEach((row) => {
+        const id = String(row['ลำดับบริการ'] || row['รายการบริการ'] || '');
+        const meta = state.serviceById.get(String(row['ลำดับบริการ'] || '')) || state.serviceByName.get(String(row['รายการบริการ'])) || {};
+        const item = byService.get(id) || {
+          id, name: row['รายการบริการ'] || meta['รายการบริการ'] || 'ไม่ระบุบริการ',
+          target:0, output:0, claim:0, paid:0, reject:0, gap:0, loss:0
+        };
+        const target=num(row['Target']), output=num(row['ผลงาน']), claim=num(row['Claim ผ่าน']), paid=num(row['Paid']), reject=num(row['Reject']);
+        const rate=num(meta['อัตราวางแผน (บาท)'] ?? row._rate);
+        const gap=Math.max(target-output,0);
+        item.target+=target; item.output+=output; item.claim+=claim; item.paid+=paid; item.reject+=reject; item.gap+=gap; item.loss+=gap*rate;
+        byService.set(id,item);
+      });
+      return Array.from(byService.values()).map(x=>({
+        ...x, coverage:pct(x.output,x.target), claimRate:pct(x.claim,x.output), paidRate:pct(x.paid,x.claim),
+        unclaimed:Math.max(x.output-x.claim,0), unpaid:Math.max(x.claim-x.paid,0)
+      }));
+    }
+
+    function renderExecutiveWarning() {
+      const rows=executiveRows();
+      const active=rows.filter(x=>x.target>0 || x.output>0 || x.claim>0 || x.paid>0);
+      const red=active.filter(x=>x.target>0 && x.coverage<60).length;
+      const yellow=active.filter(x=>x.target>0 && x.coverage>=60 && x.coverage<80).length;
+      const green=active.filter(x=>x.target>0 && x.coverage>=80).length;
+      const totalLoss=active.reduce((a,x)=>a+x.loss,0);
+      const totalReject=active.reduce((a,x)=>a+x.reject,0);
+      const totalUnpaid=active.reduce((a,x)=>a+x.unpaid,0);
+      $('executiveCards').innerHTML=[
+        ['🔴 ต้องเร่ง',fmt.format(red),'Coverage ต่ำกว่า 60%'],
+        ['🟡 เฝ้าระวัง',fmt.format(yellow),'Coverage 60–79.9%'],
+        ['🟢 ตามเป้า',fmt.format(green),'Coverage ตั้งแต่ 80%'],
+        ['Opportunity Loss',moneyFmt.format(totalLoss)+' บาท',`Reject ${fmt.format(totalReject)} • Claim ยังไม่ Paid ${fmt.format(totalUnpaid)}`]
+      ].map(x=>`<article class="exec-card"><h3>${esc(x[0])}</h3><div class="big">${esc(x[1])}</div><small>${esc(x[2])}</small></article>`).join('');
+
+      const scored=active.map(x=>{
+        let score=0;
+        if(x.target>0) score += x.coverage<60?300:x.coverage<80?180:0;
+        score += x.loss>0?Math.min(150,x.loss/1000):0;
+        score += x.gap>0?Math.min(100,x.gap):0;
+        score += x.reject>0?80:0;
+        score += x.unpaid>0?60:0;
+        return {...x,score};
+      }).sort((a,b)=>b.score-a.score || b.loss-a.loss || b.gap-a.gap).slice(0,8);
+      $('earlyWarningList').innerHTML=scored.length?scored.map(x=>{
+        const cls=x.target>0?(x.coverage<60?'red':x.coverage<80?'yellow':'green'):'yellow';
+        const label=x.target>0?(x.coverage<60?'เร่งด่วน':x.coverage<80?'เฝ้าระวัง':'ตามเป้า'):'ติดตาม';
+        const issues=[];
+        if(x.gap>0) issues.push(`Gap ${fmt.format(x.gap)}`);
+        if(x.loss>0) issues.push(`Loss ${moneyFmt.format(x.loss)} บาท`);
+        if(x.unclaimed>0) issues.push(`ผลงานยังไม่ Claim ${fmt.format(x.unclaimed)}`);
+        if(x.unpaid>0) issues.push(`Claim ยังไม่ Paid ${fmt.format(x.unpaid)}`);
+        if(x.reject>0) issues.push(`Reject ${fmt.format(x.reject)}`);
+        return `<div class="alert-item"><span class="signal ${cls}">${label}</span><div><div class="alert-name">${esc(x.name)}</div><div class="alert-detail">${esc(issues.join(' • ') || 'ยังไม่พบประเด็นเตือนเพิ่มเติม')}</div></div><div style="text-align:right;font-weight:900">${x.target>0?x.coverage.toFixed(1)+'%':'–'}</div></div>`;
+      }).join(''):'<div class="empty">ยังไม่มีข้อมูลเพียงพอสำหรับ Early Warning ตามตัวกรองนี้</div>';
+
+      const actions=[];
+      const worstCov=active.filter(x=>x.target>0).sort((a,b)=>a.coverage-b.coverage)[0];
+      const worstLoss=[...active].sort((a,b)=>b.loss-a.loss)[0];
+      const worstReject=[...active].sort((a,b)=>b.reject-a.reject)[0];
+      const worstUnclaimed=[...active].sort((a,b)=>b.unclaimed-a.unclaimed)[0];
+      const worstUnpaid=[...active].sort((a,b)=>b.unpaid-a.unpaid)[0];
+      if(worstCov && worstCov.coverage<80) actions.push(`เร่งเพิ่มผลงาน “${worstCov.name}” ซึ่ง Coverage ${worstCov.coverage.toFixed(1)}% และ Gap ${fmt.format(worstCov.gap)}`);
+      if(worstLoss && worstLoss.loss>0) actions.push(`ทบทวน Opportunity Loss ของ “${worstLoss.name}” ประมาณ ${moneyFmt.format(worstLoss.loss)} บาท`);
+      if(worstUnclaimed && worstUnclaimed.unclaimed>0) actions.push(`ตรวจสอบการส่ง Claim “${worstUnclaimed.name}” ยังมีผลงานที่ไม่เป็น Claim ${fmt.format(worstUnclaimed.unclaimed)}`);
+      if(worstUnpaid && worstUnpaid.unpaid>0) actions.push(`ติดตาม Claim ที่ยังไม่ Paid ของ “${worstUnpaid.name}” จำนวน ${fmt.format(worstUnpaid.unpaid)}`);
+      if(worstReject && worstReject.reject>0) actions.push(`เร่งแก้ Reject ของ “${worstReject.name}” จำนวน ${fmt.format(worstReject.reject)}`);
+      if(!actions.length) actions.push('ยังไม่พบสัญญาณเร่งด่วนจากข้อมูลตามตัวกรองปัจจุบัน ควรติดตามการบันทึกข้อมูลให้ครบทุกเดือน');
+      $('executiveActions').innerHTML=actions.slice(0,5).map((a,i)=>`<div class="action-item">${i+1}. ${esc(a)}</div>`).join('');
+    }
+
+    function renderUnitRanking() {
+      const role = String(state.profile?.role || '').toUpperCase();
+      const section = $('unitRankingSection');
+      section.style.display = '';
+      const heading = section.querySelector('.section-title');
+      const subtitle = section.querySelector('.section-subtitle');
+      if (role === 'UNIT') {
+        if (heading) heading.textContent = 'ผลงานหน่วยบริการของฉัน';
+        if (subtitle) subtitle.textContent = 'แสดงเฉพาะหน่วยบริการที่บัญชีของคุณได้รับสิทธิ์';
+      } else {
+        if (heading) heading.textContent = 'เปรียบเทียบผลงานหน่วยบริการ';
+        if (subtitle) subtitle.textContent = 'ADMIN / MANAGER เห็นภาพรวม CUP • คลิกแถวเพื่อกรอง Dashboard ตามหน่วยบริการ';
+      }
+      const f = filters();
+      const profileUnit = String(state.profile?.unit || '').trim();
+      const rows = state.tracker.filter((row) => {
+        const serviceId = String(row['ลำดับบริการ'] || '');
+        const meta = state.serviceById.get(serviceId) || state.serviceByName.get(String(row['รายการบริการ'])) || {};
+        const text = [row['รายการบริการ'], row['หน่วยบริการ'], row['หมายเหตุ'], meta['ผู้รับผิดชอบหลัก']].join(' ').toLowerCase();
+        return (role !== 'UNIT' || String(row['หน่วยบริการ'] || '').trim() === profileUnit) &&
+          (!f.month || row['เดือน'] === f.month) &&
+          (!f.service || serviceId === f.service) &&
+          (!f.priority || meta['Priority'] === f.priority) &&
+          (!f.search || text.includes(f.search));
+      });
+      const byUnit = new Map();
+      rows.forEach(row => {
+        const unit = String(row['หน่วยบริการ'] || '').trim();
+        if (!unit) return;
+        if (!byUnit.has(unit)) byUnit.set(unit, []);
+        byUnit.get(unit).push(row);
+      });
+      const ranked = Array.from(byUnit, ([unit, rs]) => ({ unit, ...summarize(rs) }))
+        .map(x => ({...x, coverage: pct(x.output, x.target)}))
+        .sort((a,b) => b.coverage - a.coverage || b.output - a.output);
+      $('unitRankingBody').innerHTML = ranked.map((x,i) => {
+        const cov = x.coverage;
+        const badge = cov >= 80 ? 'low' : cov >= 60 ? 'mid' : 'high';
+        return `<tr class="unit-rank-row" data-unit="${esc(x.unit)}" style="cursor:pointer">
+          <td><b>${i+1}</b></td><td class="service-name">${esc(x.unit)}</td>
+          <td>${fmt.format(x.target)}</td><td>${fmt.format(x.output)}</td>
+          <td><span class="pill ${badge}">${cov.toFixed(1)}%</span><div class="progress"><span style="width:${clampPct(cov)}%"></span></div></td>
+          <td>${fmt.format(x.claim)}</td><td>${fmt.format(x.paid)}</td><td>${fmt.format(x.reject)}</td>
+          <td>${fmt.format(x.gap)}</td><td>${moneyFmt.format(x.loss)}</td></tr>`;
+      }).join('') || '<tr><td colspan="10"><div class="empty">ยังไม่มีข้อมูลสำหรับเปรียบเทียบตามตัวกรองนี้</div></td></tr>';
+      if (role !== 'UNIT') {
+        document.querySelectorAll('.unit-rank-row').forEach(tr => tr.addEventListener('click', () => {
+          $('filterUnit').value = tr.dataset.unit; renderAll();
+          window.scrollTo({top:0, behavior:'smooth'});
+        }));
+      }
+    }
+
+    function renderMasterTable() {
+      const rows = masterFiltered();
+      $('masterTbody').innerHTML = rows.map((row) => {
+        const priorityClass = row['Priority'] === 'สูง' ? 'high' : row['Priority'] === 'กลาง' ? 'mid' : 'low';
+        return `
+          <tr>
+            <td>${esc(row['ลำดับ'])}</td>
+            <td class="service-name">${esc(row['รายการบริการ'])}<br><small style="color:var(--muted);font-weight:600;">${esc(row['ผู้รับผิดชอบหลัก'])}</small></td>
+            <td><span class="pill ${priorityClass}">${esc(row['Priority'])}</span></td>
+            <td>${fmt.format(num(row['Target ปี']))}</td>
+            <td>${fmt.format(num(row['ผลงาน']))}</td>
+            <td>${num(row['Coverage %']).toFixed(1)}%<div class="progress"><span style="width:${clampPct(row['Coverage %'])}%"></span></div></td>
+            <td>${num(row['Claim Rate %']).toFixed(1)}%</td>
+            <td>${num(row['Paid Rate %']).toFixed(1)}%</td>
+            <td>${fmt.format(num(row['Gap']))}</td>
+            <td>${moneyFmt.format(num(row['Opportunity Loss']))}</td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="10"><div class="empty">ไม่พบข้อมูลตามตัวกรอง</div></td></tr>';
+    }
+
+    function renderTrackerTable() {
+      const rows = trackerFiltered().slice(0, 120);
+      $('trackerTbody').innerHTML = rows.map((row) => `
+        <tr>
+          <td>${esc(row['เดือน'])}</td>
+          <td>${esc(row['หน่วยบริการ'])}</td>
+          <td class="service-name">${esc(row['ลำดับบริการ'])}. ${esc(row['รายการบริการ'])}</td>
+          <td>${fmt.format(num(row['Target']))}</td>
+          <td>${fmt.format(num(row['ผลงาน']))}</td>
+          <td>${fmt.format(num(row['Claim ผ่าน']))}</td>
+          <td>${fmt.format(num(row['Paid']))}</td>
+          <td>${fmt.format(num(row['Reject']))}</td>
+          <td>${moneyFmt.format(num(row['มูลค่า Paid']) || num(row._paidValue))}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="9"><div class="empty">ไม่พบข้อมูลตามตัวกรอง</div></td></tr>';
+    }
+
+    function renderAll() {
+      renderKpis();
+      renderExecutiveWarning();
+      renderUnitRanking();
+      renderMonthlyChart();
+      renderPriorityDonut();
+      renderTopGap();
+      renderMasterTable();
+      renderTrackerTable();
+    }
+
+    function populateMasterForm() {
+      const id = $('masterService').value || (state.options.services[0]?.id || '');
+      if (id && !$('masterService').value) $('masterService').value = id;
+      const row = state.serviceById.get(String(id));
+      if (!row) return;
+      $('masterPriority').value = row['Priority'] || 'สูง';
+      $('masterRate').value = num(row['อัตราวางแผน (บาท)']);
+      $('masterTarget').value = num(row['Target ปี']);
+      $('masterOutput').value = num(row['ผลงาน']);
+      $('masterClaim').value = num(row['Claim ผ่าน (ครั้ง)']);
+      $('masterPaid').value = num(row['Paid (ครั้ง)']);
+      $('masterOwner').value = row['ผู้รับผิดชอบหลัก'] || '';
+    }
+
+    function findMonthlyRecord() {
+      const month = String($('monthlyMonth').value || '').trim();
+      const unit = String($('monthlyUnit').value || '').trim();
+      const serviceId = String($('monthlyService').value || '').trim();
+      const service = state.serviceById.get(serviceId);
+      const serviceName = String(service?.['รายการบริการ'] || '').trim();
+      return state.tracker.find((row) =>
+        String(row['เดือน'] || '').trim() === month &&
+        String(row['หน่วยบริการ'] || '').trim() === unit &&
+        (String(row['ลำดับบริการ'] || '').trim() === serviceId ||
+         (serviceName && String(row['รายการบริการ'] || '').trim() === serviceName))
+      );
+    }
+
+    function populateMonthlyForm() {
+      if (!$('monthlyMonth').value && state.options.months.length) $('monthlyMonth').value = state.options.months[0];
+      if (!$('monthlyService').value && state.options.services.length) $('monthlyService').value = state.options.services[0].id;
+      const row = findMonthlyRecord();
+      $('monthlyTarget').value = row ? num(row['Target']) : 0;
+      $('monthlyOutput').value = row ? num(row['ผลงาน']) : 0;
+      $('monthlyClaim').value = row ? num(row['Claim ผ่าน']) : 0;
+      $('monthlyPaid').value = row ? num(row['Paid']) : 0;
+      $('monthlyReject').value = row ? num(row['Reject']) : 0;
+      $('monthlyPaidValue').value = row ? (num(row['มูลค่า Paid']) || num(row._paidValue)) : 0;
+      $('monthlyNote').value = row ? (row['หมายเหตุ'] || '') : '';
+    }
+
+    function populateTargetForm() {
+      const unit = String($('targetUnit').value || '').trim();
+      const row = state.targets.find((r) => String(r['รพ.สต./หน่วยบริการ'] || '').trim() === unit);
+      if (!row) {
+        ['targetPopulation','targetDm','targetLipid','targetCervical','targetFit','targetTb','targetHbv','targetHcv','targetCbc','targetFe','targetChild612','targetChild35','targetFrax'].forEach(id => $(id).value = 0);
+        $('targetNote').value = '';
+        return;
+      }
+      $('targetPopulation').value = num(row['ประชากรทั้งหมด']);
+      $('targetDm').value = num(row['DM 35-59 เสี่ยง']);
+      $('targetLipid').value = num(row['Lipid 45-70']);
+      $('targetCervical').value = num(row['Cervical Due']);
+      $('targetFit').value = num(row['FIT Due']);
+      $('targetTb').value = num(row['TB Risk']);
+      $('targetHbv').value = num(row['HBV Due']);
+      $('targetHcv').value = num(row['HCV Due']);
+      $('targetCbc').value = num(row['หญิง 13-24 CBC']);
+      $('targetFe').value = num(row['หญิง 13-45 Fe/Folic']);
+      $('targetChild612').value = num(row['เด็ก 6-12ด.']);
+      $('targetChild35').value = num(row['เด็ก 3-5ปี']);
+      $('targetFrax').value = num(row['หญิง ≥60 FRAX']);
+      $('targetNote').value = row['หมายเหตุ'] || '';
+    }
+
+    async function saveMaster(event) {
+      event.preventDefault();
+      const button = event.submitter;
+      setBusy(button, true);
+      try {
+        const serviceId = $('masterService').value;
+        const row = state.serviceById.get(String(serviceId));
+        await api('saveMaster', {
+          serviceId,
+          serviceName: row?.['รายการบริการ'] || '',
+          priority: $('masterPriority').value,
+          owner: $('masterOwner').value,
+          planRate: $('masterRate').value,
+          targetYear: $('masterTarget').value,
+          output: $('masterOutput').value,
+          claimPass: $('masterClaim').value,
+          paid: $('masterPaid').value
+        });
+        toast('บันทึก Master Plan สำเร็จ', 'success');
+        await loadDashboard();
+      } catch (err) {
+        toast(err.message, 'error');
+      } finally {
+        setBusy(button, false);
+      }
+    }
+
+    async function saveMonthly(event) {
+      event.preventDefault();
+      const button = event.submitter;
+      setBusy(button, true);
+      try {
+        const serviceId = $('monthlyService').value;
+        const row = state.serviceById.get(String(serviceId));
+        await api('saveMonthly', {
+          month: $('monthlyMonth').value,
+          unit: $('monthlyUnit').value,
+          serviceId,
+          serviceName: row?.['รายการบริการ'] || '',
+          target: $('monthlyTarget').value,
+          output: $('monthlyOutput').value,
+          claimPass: $('monthlyClaim').value,
+          paid: $('monthlyPaid').value,
+          reject: $('monthlyReject').value,
+          paidValue: $('monthlyPaidValue').value,
+          note: $('monthlyNote').value
+        });
+        toast('บันทึก Monthly Tracker สำเร็จ', 'success');
+        await loadDashboard();
+      } catch (err) {
+        toast(err.message, 'error');
+      } finally {
+        setBusy(button, false);
+      }
+    }
+
+    async function saveTarget(event) {
+      event.preventDefault();
+      const button = event.submitter;
+      setBusy(button, true);
+      try {
+        await api('saveTarget', {
+          unit: $('targetUnit').value,
+          population: $('targetPopulation').value,
+          dmRisk: $('targetDm').value,
+          lipid: $('targetLipid').value,
+          cervical: $('targetCervical').value,
+          fit: $('targetFit').value,
+          hbv: $('targetHbv').value,
+          hcv: $('targetHcv').value,
+          tbRisk: $('targetTb').value,
+          cbc1324: $('targetCbc').value,
+          feFolic1345: $('targetFe').value,
+          child612: $('targetChild612').value,
+          child35: $('targetChild35').value,
+          frax60: $('targetFrax').value,
+          note: $('targetNote').value
+        });
+        toast('บันทึก RPH Target สำเร็จ', 'success');
+        await loadDashboard();
+      } catch (err) {
+        toast(err.message, 'error');
+      } finally {
+        setBusy(button, false);
+      }
+    }
+
+    function applyPermissions() {
+      const p = state.profile || {};
+      const role = String(p.role || '').toUpperCase();
+      $('userBadge').textContent = `${p.fullName || p.username || ''} • ${role || '-'}${p.unit ? ' • ' + p.unit : ''}`;
+      $('adminBtn').style.display = role === 'ADMIN' ? '' : 'none';
+      if ($('dashboardScope')) {
+        $('dashboardScope').textContent = role === 'UNIT'
+          ? `Dashboard หน่วยบริการ: ${p.unit || '-'} • แสดงเฉพาะข้อมูลที่ได้รับสิทธิ์`
+          : 'Dashboard ภาพรวม CUP • เปรียบเทียบ Target, ผลงาน, Claim, Paid, Gap และ Opportunity Loss ทุกหน่วยบริการ';
+      }
+      const masterCard = $('masterForm')?.closest('.form-card') || $('masterForm')?.parentElement;
+      if (masterCard) masterCard.style.display = (role === 'ADMIN' || role === 'MANAGER') ? '' : 'none';
+      if (role === 'UNIT' && p.unit) {
+        const unit = String(p.unit).trim();
+        const ensureUnitOption = (select) => {
+          if (!select) return;
+          const exists = Array.from(select.options).some(o => String(o.value).trim() === unit);
+          if (!exists) select.add(new Option(unit, unit));
+          select.value = unit;
+          select.disabled = true;
+        };
+        ensureUnitOption($('monthlyUnit'));
+        ensureUnitOption($('targetUnit'));
+        ensureUnitOption($('filterUnit'));
+        // ต้อง populate หลังยืนยันหน่วยแล้ว เพื่อไม่ให้ค่า placeholder/หน่วยก่อนหน้าค้างอยู่
+        populateMonthlyForm();
+        populateTargetForm();
+      } else {
+        ['monthlyUnit','targetUnit','filterUnit'].forEach(id => { if ($(id)) $(id).disabled = false; });
+      }
+    }
+
+    async function openRegister() {
+      $('registerMessage').textContent = '';
+      $('registerModal').style.display = 'flex';
+      try {
+        const units = await api('publicUnits');
+        $('regUnit').innerHTML = '<option value="">-- เลือกหน่วยบริการ --</option>' + units.map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('');
+      } catch(err) { $('registerMessage').textContent = err.message; }
+    }
+
+    async function submitRegister(event) {
+      event.preventDefault(); const b=event.submitter; setBusy(b,true); $('registerMessage').textContent='';
+      try {
+        const r=await api('register',{fullName:$('regFullName').value,username:$('regUsername').value,password:$('regPassword').value,unit:$('regUnit').value,note:$('regNote').value});
+        $('registerMessage').style.color='#059669'; $('registerMessage').textContent=r.message || 'สมัครสำเร็จ กรุณารอ Admin อนุมัติ';
+        event.target.reset();
+      } catch(err){ $('registerMessage').style.color='#dc2626'; $('registerMessage').textContent=err.message; }
+      finally{setBusy(b,false);}
+    }
+
+    async function openAdmin() { $('adminModal').style.display='flex'; await loadUsers(); }
+    async function loadUsers() {
+      try {
+        const users=await api('listUsers');
+        $('usersBody').innerHTML=users.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.fullName)}</td><td>${esc(u.unit)}</td><td><select data-role="${esc(u.username)}"><option ${u.role==='UNIT'?'selected':''}>UNIT</option><option ${u.role==='MANAGER'?'selected':''}>MANAGER</option><option ${u.role==='ADMIN'?'selected':''}>ADMIN</option></select></td><td><select data-status="${esc(u.username)}"><option ${u.status==='PENDING'?'selected':''}>PENDING</option><option ${u.status==='ACTIVE'?'selected':''}>ACTIVE</option><option ${u.status==='SUSPENDED'?'selected':''}>SUSPENDED</option></select></td><td><button class="btn secondary user-save" type="button" data-user="${esc(u.username)}">บันทึก</button></td></tr>`).join('');
+        document.querySelectorAll('.user-save').forEach(btn=>btn.onclick=async()=>{const user=btn.dataset.user; const role=document.querySelector(`[data-role="${CSS.escape(user)}"]`).value; const status=document.querySelector(`[data-status="${CSS.escape(user)}"]`).value; try{await api('updateUser',{username:user,role,status});toast('อัปเดตผู้ใช้แล้ว','success');await loadUsers();}catch(e){toast(e.message,'error');}});
+      } catch(err){ toast(err.message,'error'); }
+    }
+
+    function bindEvents() {
+      $('registerBtn').addEventListener('click', openRegister);
+      $('closeRegisterBtn').addEventListener('click', () => $('registerModal').style.display='none');
+      $('registerForm').addEventListener('submit', submitRegister);
+      $('adminBtn').addEventListener('click', openAdmin);
+      $('closeAdminBtn').addEventListener('click', () => $('adminModal').style.display='none');
+
+      $('loginForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        $('loginMessage').textContent = '';
+        const button = event.submitter;
+        setBusy(button, true);
+        try {
+          await login($('username').value, $('password').value);
+          $('loginScreen').style.display = 'none';
+          $('app').style.display = 'block';
+          await loadDashboard();
+          toast('เข้าสู่ระบบสำเร็จ', 'success');
+        } catch (err) {
+          $('loginMessage').textContent = err.message;
+        } finally {
+          setBusy(button, false);
+        }
+      });
+
+      $('demoHintBtn').addEventListener('click', () => {
+        toast(isGasReady() ? 'GAS_URL พร้อมใช้งาน' : 'ยังไม่ได้ใส่ GAS Web App URL ในไฟล์ HTML', isGasReady() ? 'success' : 'error');
+      });
+      $('logoutBtn').addEventListener('click', logout);
+      $('refreshBtn').addEventListener('click', async () => {
+        try { await loadDashboard(); toast('รีเฟรชข้อมูลแล้ว', 'success'); }
+        catch (err) { toast(err.message, 'error'); if (/Session/.test(err.message)) logout(); }
+      });
+      $('clearFiltersBtn').addEventListener('click', () => {
+        ['filterMonth', 'filterUnit', 'filterPriority', 'filterService', 'filterSearch'].forEach((id) => $(id).value = '');
+        renderAll();
+      });
+      ['filterMonth', 'filterUnit', 'filterPriority', 'filterService', 'filterSearch'].forEach((id) => {
+        $(id).addEventListener(id === 'filterSearch' ? 'input' : 'change', renderAll);
+      });
+
+      $('masterService').addEventListener('change', populateMasterForm);
+      $('monthlyMonth').addEventListener('change', populateMonthlyForm);
+      $('monthlyUnit').addEventListener('change', populateMonthlyForm);
+      $('monthlyService').addEventListener('change', populateMonthlyForm);
+      $('targetUnit').addEventListener('change', populateTargetForm);
+      $('masterForm').addEventListener('submit', saveMaster);
+      $('monthlyForm').addEventListener('submit', saveMonthly);
+      $('targetForm').addEventListener('submit', saveTarget);
+    }
+
+    async function boot() {
+      bindEvents();
+      if (state.token) {
+        $('loginScreen').style.display = 'none';
+        $('app').style.display = 'block';
+        try {
+          await loadDashboard();
+        } catch (err) {
+          toast(err.message, 'error');
+          logout();
+        }
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
